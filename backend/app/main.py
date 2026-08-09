@@ -1,10 +1,16 @@
 from fastapi import FastAPI
 
+from app.api import tweets
+
 
 app = FastAPI(
     title="TweetVault API",
-    description="Personal X archive system",
     version="0.1.0"
+)
+
+
+app.include_router(
+    tweets.router
 )
 
 
