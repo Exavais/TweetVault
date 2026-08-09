@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Environment
+.env
+
+# Media
+storage/media/
+storage/exports/
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
