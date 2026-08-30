@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from pydantic import BaseModel, Field
 
 
 class ArchiveCreate(BaseModel):
@@ -11,6 +12,26 @@ class ArchiveCreate(BaseModel):
     content: str
 
     tweet_created_at: datetime | None = None
+
+
+
+class MediaResponse(BaseModel):
+
+    id: int
+
+    filename: str
+
+    file_path: str
+
+    media_type: str
+
+    size: int
+
+    spoiler: bool
+
+
+    class Config:
+        from_attributes = True
 
 
 
@@ -28,25 +49,7 @@ class ArchiveResponse(BaseModel):
 
     saved_at: datetime
 
-
-    class Config:
-        from_attributes = True
-
-
-
-class MediaResponse(BaseModel):
-
-    id: int
-
-    filename: str
-
-    file_path: str
-
-    media_type: str
-
-    size: int
-
-    spoiler: bool
+    media: list[MediaResponse] = Field(default_factory=list)
 
 
     class Config:
@@ -133,6 +136,8 @@ class TimelineResponse(BaseModel):
     tweet_created_at: datetime | None
 
     saved_at: datetime
+
+    media: list[MediaResponse] = Field(default_factory=list)
 
 
     class Config:

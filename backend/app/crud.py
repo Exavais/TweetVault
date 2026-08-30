@@ -9,6 +9,7 @@ from .models import ArchiveTag
 from .models import Comment
 
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 
 def create_archive(
@@ -395,25 +396,20 @@ def search_archives(
 
 
 
-def get_timeline(
-    db: Session,
-    author: str | None = None
-):
+def get_timeline(db, author=None):
 
-    query = db.query(Archive)
-
+    query = (
+        db.query(Archive)
+        .options(
+            joinedload(Archive.media)
+        )
+    )
 
     if author:
-
         query = query.filter(
-            Archive.author.contains(author)
+            Archive.author == author
         )
 
-
-    return (
-        query
-        .order_by(
-            Archive.tweet_created_at.desc()
-        )
-        .all()
-    )
+    return query.order_by(
+        Archive.saved_at.desc()
+    ).all()

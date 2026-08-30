@@ -15,6 +15,8 @@ from sqlalchemy import Table
 from sqlalchemy import DateTime
 from sqlalchemy.sql import func
 
+from sqlalchemy.orm import relationship
+
 
 class Archive(Base):
 
@@ -49,9 +51,16 @@ class Archive(Base):
     nullable=True
 )
 
+
     saved_at = Column(
         DateTime,
         default=datetime.utcnow
+    )
+
+
+    media = relationship(
+        "Media",
+        back_populates="archive"
     )
 
 
@@ -105,6 +114,11 @@ class Media(Base):
         default=True
     )
 
+
+    archive = relationship(
+        "Archive",
+        back_populates="media"
+    )
 
 
 class Tag(Base):

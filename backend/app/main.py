@@ -13,8 +13,9 @@ from .schemas import ArchiveResponse
 from . import crud
 
 from fastapi import UploadFile, File
+from fastapi import HTTPException
 
-from .models import Media
+from .models import Archive, Media
 from .schemas import MediaResponse
 
 from .storage import save_file
@@ -31,6 +32,10 @@ from datetime import datetime
 from .schemas import SearchResponse
 
 from .schemas import TimelineResponse
+
+from fastapi.middleware.cors import CORSMiddleware
+
+from sqlalchemy.orm import joinedload
 
 
 Base.metadata.create_all(
@@ -107,35 +112,44 @@ def delete_archive(
 
 
 @app.post(
-    "/api/media/upload",
+    "/api/archives/{archive_id}/media/upload",
     response_model=MediaResponse
 )
 def upload_media(
+    archive_id: int,
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+
+    # 检查对应 Archive 是否存在
+    archive = (
+        db.query(Archive)
+        .filter(Archive.id == archive_id)
+        .first()
+    )
+
+    if archive is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Archive not found"
+        )
+
 
     path = save_file(file)
 
 
     media = Media(
-
+        archive_id=archive_id,
         filename=file.filename,
-
         file_path=path,
-
         media_type=file.content_type,
-
         size=os.path.getsize(path),
-
         spoiler=True
     )
 
 
     db.add(media)
-
     db.commit()
-
     db.refresh(media)
 
 
@@ -341,3 +355,18 @@ def timeline(
         db,
         author
     )
+
+
+app.add_middleware(
+    CORSMiddleware,
+
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+
+    allow_credentials=True,
+
+    allow_methods=["*"],
+
+    allow_headers=["*"],
+)
