@@ -27,3 +27,23 @@ class ArchiveResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class MediaResponse(BaseModel):
+
+    id: int
+
+    filename: str
+
+    file_path: str
+
+    media_type: str
+
+    size: int
+
+    spoiler: bool
+
+
+    class Config:
+        from_attributes = True

@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
@@ -9,6 +11,13 @@ from .schemas import ArchiveCreate
 from .schemas import ArchiveResponse
 
 from . import crud
+
+from fastapi import UploadFile, File
+
+from .models import Media
+from .schemas import MediaResponse
+
+from .storage import save_file
 
 
 Base.metadata.create_all(
@@ -82,3 +91,39 @@ def delete_archive(
     return {
         "message": "deleted"
     }
+
+
+@app.post(
+    "/api/media/upload",
+    response_model=MediaResponse
+)
+def upload_media(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+
+    path = save_file(file)
+
+
+    media = Media(
+
+        filename=file.filename,
+
+        file_path=path,
+
+        media_type=file.content_type,
+
+        size=os.path.getsize(path),
+
+        spoiler=True
+    )
+
+
+    db.add(media)
+
+    db.commit()
+
+    db.refresh(media)
+
+
+    return media
