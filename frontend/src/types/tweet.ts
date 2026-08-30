@@ -1,3 +1,19 @@
+export interface User {
+
+    id:number;
+
+    twitter_id:string;
+
+    username:string;
+
+    display_name:string | null;
+
+    avatar_path:string | null;
+
+}
+
+
+
 export interface Media {
 
     id:number;
@@ -11,22 +27,32 @@ export interface Media {
     size:number;
 
     spoiler:boolean;
+
 }
+
 
 
 export interface Tweet {
 
+
     id:number;
+
 
     url:string;
 
-    author:string;
+
+    user:User;
+
 
     content:string;
 
-    tweet_created_at:string|null;
+
+    tweet_created_at:string | null;
+
 
     saved_at:string;
 
-    media: Media[];
+
+    media:Media[];
+
 }

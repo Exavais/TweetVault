@@ -1,15 +1,13 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from .models import Archive
-from .schemas import ArchiveCreate
-
+from .models import User
 from .models import Media
 from .models import Tag
 from .models import ArchiveTag
 from .models import Comment
 
-from sqlalchemy import or_
-from sqlalchemy.orm import joinedload
 
 
 def create_archive(
@@ -18,11 +16,17 @@ def create_archive(
 ):
 
     db_archive = Archive(
+
         url=archive.url,
-        author=archive.author,
+
+        user_id=archive.user_id,
+
         content=archive.content,
+
         tweet_created_at=archive.tweet_created_at
+
     )
+
 
     db.add(db_archive)
 
@@ -34,44 +38,87 @@ def create_archive(
 
 
 
+
+
 def get_archives(
     db: Session
 ):
 
-    return db.query(
-        Archive
-    ).all()
+    return (
+
+        db.query(Archive)
+
+        .options(
+
+            joinedload(Archive.user),
+
+            joinedload(Archive.media)
+
+        )
+
+        .all()
+
+    )
+
+
 
 
 
 def get_archive(
     db: Session,
-    archive_id:int
+    archive_id: int
 ):
 
-    return db.query(
-        Archive
-    ).filter(
-        Archive.id == archive_id
-    ).first()
+    return (
+
+        db.query(Archive)
+
+        .options(
+
+            joinedload(Archive.user),
+
+            joinedload(Archive.media)
+
+        )
+
+        .filter(
+
+            Archive.id == archive_id
+
+        )
+
+        .first()
+
+    )
+
+
 
 
 
 def delete_archive(
-    db:Session,
-    archive_id:int
+    db: Session,
+    archive_id: int
 ):
 
     item = get_archive(
+
         db,
+
         archive_id
+
     )
 
+
     if item:
+
         db.delete(item)
+
         db.commit()
 
+
     return item
+
+
 
 
 
@@ -80,11 +127,21 @@ def get_media(
     media_id: int
 ):
 
-    return db.query(
-        Media
-    ).filter(
-        Media.id == media_id
-    ).first()
+    return (
+
+        db.query(Media)
+
+        .filter(
+
+            Media.id == media_id
+
+        )
+
+        .first()
+
+    )
+
+
 
 
 
@@ -94,9 +151,13 @@ def toggle_media_spoiler(
 ):
 
     media = get_media(
+
         db,
+
         media_id
+
     )
+
 
     if media:
 
@@ -111,25 +172,40 @@ def toggle_media_spoiler(
 
 
 
+
+
 def create_tag(
     db: Session,
     name: str
 ):
 
-    tag = db.query(
-        Tag
-    ).filter(
-        Tag.name == name
-    ).first()
+    tag = (
+
+        db.query(Tag)
+
+        .filter(
+
+            Tag.name == name
+
+        )
+
+        .first()
+
+    )
 
 
     if tag:
+
         return tag
 
 
+
     tag = Tag(
+
         name=name
+
     )
+
 
     db.add(tag)
 
@@ -137,7 +213,10 @@ def create_tag(
 
     db.refresh(tag)
 
+
     return tag
+
+
 
 
 
@@ -148,14 +227,20 @@ def add_tag_to_archive(
 ):
 
     tag = create_tag(
+
         db,
+
         tag_name
+
     )
 
 
     relation = ArchiveTag(
+
         archive_id=archive_id,
+
         tag_id=tag.id
+
     )
 
 
@@ -168,22 +253,36 @@ def add_tag_to_archive(
 
 
 
+
+
 def get_archive_tags(
     db: Session,
     archive_id: int
 ):
 
     return (
+
         db.query(Tag)
+
         .join(
+
             ArchiveTag,
+
             Tag.id == ArchiveTag.tag_id
+
         )
+
         .filter(
+
             ArchiveTag.archive_id == archive_id
+
         )
+
         .all()
+
     )
+
+
 
 
 
@@ -194,12 +293,19 @@ def remove_tag_from_archive(
 ):
 
     relation = (
+
         db.query(ArchiveTag)
+
         .filter(
+
             ArchiveTag.archive_id == archive_id,
+
             ArchiveTag.tag_id == tag_id
+
         )
+
         .first()
+
     )
 
 
@@ -214,6 +320,8 @@ def remove_tag_from_archive(
 
 
 
+
+
 def create_comment(
     db: Session,
     archive_id: int,
@@ -221,15 +329,24 @@ def create_comment(
 ):
 
     comment = Comment(
+
         archive_id=archive_id,
+
         content=content
+
     )
 
+
     db.add(comment)
+
     db.commit()
+
     db.refresh(comment)
 
+
     return comment
+
+
 
 
 
@@ -239,12 +356,20 @@ def get_comments(
 ):
 
     return (
+
         db.query(Comment)
+
         .filter(
+
             Comment.archive_id == archive_id
+
         )
+
         .all()
+
     )
+
+
 
 
 
@@ -255,12 +380,19 @@ def update_comment(
 ):
 
     comment = (
+
         db.query(Comment)
+
         .filter(
+
             Comment.id == comment_id
+
         )
+
         .first()
+
     )
+
 
     if comment:
 
@@ -270,7 +402,10 @@ def update_comment(
 
         db.refresh(comment)
 
+
     return comment
+
+
 
 
 
@@ -280,12 +415,19 @@ def delete_comment(
 ):
 
     comment = (
+
         db.query(Comment)
+
         .filter(
+
             Comment.id == comment_id
+
         )
+
         .first()
+
     )
+
 
     if comment:
 
@@ -293,7 +435,10 @@ def delete_comment(
 
         db.commit()
 
+
     return comment
+
+
 
 
 
@@ -312,104 +457,181 @@ def search_archives(
     query = db.query(Archive)
 
 
-    # 作者搜索
+
     if author:
 
-        query = query.filter(
-            Archive.author.contains(author)
+        query = (
+
+            query
+
+            .join(
+
+                User
+
+            )
+
+            .filter(
+
+                User.username.contains(author)
+
+            )
+
         )
 
 
-    # 文案关键词
+
     if keyword:
 
         query = query.filter(
+
             Archive.content.contains(keyword)
+
         )
 
 
-    # 推文发布时间
+
     if tweet_start:
 
         query = query.filter(
+
             Archive.tweet_created_at >= tweet_start
+
         )
+
 
 
     if tweet_end:
 
         query = query.filter(
+
             Archive.tweet_created_at <= tweet_end
+
         )
 
 
-    # 保存时间
+
     if saved_start:
 
         query = query.filter(
+
             Archive.saved_at >= saved_start
+
         )
+
 
 
     if saved_end:
 
         query = query.filter(
+
             Archive.saved_at <= saved_end
+
         )
 
 
-    # Tag 搜索
+
     if tag:
 
         query = (
+
             query
+
             .join(
+
                 ArchiveTag,
+
                 Archive.id == ArchiveTag.archive_id
+
             )
+
             .join(
+
                 Tag,
+
                 Tag.id == ArchiveTag.tag_id
+
             )
+
             .filter(
+
                 Tag.name.contains(tag)
+
             )
+
         )
 
 
-    # Comment 搜索
+
     if comment:
 
         query = (
+
             query
+
             .join(
+
                 Comment,
+
                 Archive.id == Comment.archive_id
+
             )
+
             .filter(
+
                 Comment.content.contains(comment)
+
             )
+
         )
+
 
 
     return query.distinct().all()
 
 
 
-def get_timeline(db, author=None):
+
+
+def get_timeline(
+    db: Session,
+    author=None
+):
 
     query = (
+
         db.query(Archive)
+
         .options(
-            joinedload(Archive.media)
+
+            joinedload(
+                Archive.media
+            ),
+
+            joinedload(
+                Archive.user
+            )
+
         )
+
     )
 
+
     if author:
+
         query = query.filter(
-            Archive.author == author
+
+            Archive.user.has(
+
+                User.username == author
+
+            )
+
         )
 
+
+
     return query.order_by(
-        Archive.saved_at.desc()
+
+        Archive.tweet_created_at.desc()
+
     ).all()

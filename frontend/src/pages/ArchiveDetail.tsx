@@ -29,6 +29,8 @@ import type {
 
 
 
+
+
 function formatDate(
     date:string | null | undefined
 ){
@@ -41,19 +43,33 @@ function formatDate(
 
 
     return new Date(date)
+
         .toLocaleString(
+
             undefined,
+
             {
+
                 year:"numeric",
+
                 month:"2-digit",
+
                 day:"2-digit",
+
                 hour:"2-digit",
+
                 minute:"2-digit",
+
                 second:"2-digit"
+
             }
+
         );
 
 }
+
+
+
 
 
 
@@ -72,18 +88,28 @@ export default function ArchiveDetail(){
 
 
 
-    const [tweet,setTweet] =
-        useState<Tweet | null>(null);
+
+    const [
+        tweet,
+        setTweet
+    ] = useState<Tweet | null>(null);
 
 
 
-    const [tags,setTags] =
-        useState<any[]>([]);
+
+    const [
+        tags,
+        setTags
+    ] = useState<any[]>([]);
 
 
 
-    const [comments,setComments] =
-        useState<any[]>([]);
+
+    const [
+        comments,
+        setComments
+    ] = useState<any[]>([]);
+
 
 
 
@@ -99,16 +125,19 @@ export default function ArchiveDetail(){
 
 
         getArchive(archiveId)
+
             .then(setTweet);
 
 
 
         getTags(archiveId)
+
             .then(setTags);
 
 
 
         getComments(archiveId)
+
             .then(setComments);
 
 
@@ -120,7 +149,9 @@ export default function ArchiveDetail(){
 
 
 
+
     if(!tweet){
+
 
         return (
 
@@ -139,17 +170,25 @@ export default function ArchiveDetail(){
 
 
 
+
+
     return (
 
         <div
 
             style={{
 
+                width:"100%",
+
                 maxWidth:"800px",
 
                 margin:"auto",
 
-                padding:"20px"
+                padding:"20px",
+
+                boxSizing:"border-box",
+
+                textAlign:"left"
 
             }}
 
@@ -157,19 +196,220 @@ export default function ArchiveDetail(){
 
 
 
-            <h2>
-
-                @{tweet.author}
-
-            </h2>
 
 
+            {/* Header */}
+
+            <div
+
+                style={{
+
+                    display:"flex",
+
+                    justifyContent:"space-between",
+
+                    alignItems:"flex-start",
+
+                    marginBottom:"20px"
+
+                }}
+
+            >
 
 
 
-            <p>
 
-                {tweet.content}
+                {/* User */}
+
+                <div
+
+                    style={{
+
+                        display:"flex",
+
+                        alignItems:"center",
+
+                        gap:"12px"
+
+                    }}
+
+                >
+
+
+
+                    {
+
+                        tweet.user.avatar_path &&
+
+
+                        <img
+
+                            src={
+
+                                `http://127.0.0.1:8000/${tweet.user.avatar_path}`
+
+                            }
+
+                            alt="avatar"
+
+
+                            style={{
+
+                                width:"56px",
+
+                                height:"56px",
+
+                                borderRadius:"50%",
+
+                                objectFit:"cover"
+
+                            }}
+
+                        />
+
+                    }
+
+
+
+
+
+
+
+                    <div
+
+                        style={{
+
+                            textAlign:"left"
+
+                        }}
+
+                    >
+
+
+
+                        <h2
+
+                            style={{
+
+                                margin:"0",
+
+                                textAlign:"left"
+
+                            }}
+
+                        >
+
+                            {
+
+                                tweet.user.display_name
+
+                                ??
+
+                                tweet.user.username
+
+                            }
+
+                        </h2>
+
+
+
+
+                        <div
+
+                            style={{
+
+                                color:"#666",
+
+                                textAlign:"left"
+
+                            }}
+
+                        >
+
+                            @
+
+                            {
+
+                                tweet.user.username
+
+                            }
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+
+
+                {/* Post time */}
+
+                <div
+
+                    style={{
+
+                        color:"#666",
+
+                        fontSize:"13px",
+
+                        marginTop:"6px",
+
+                        whiteSpace:"nowrap"
+
+                    }}
+
+                >
+
+                    {
+
+                        formatDate(
+
+                            tweet.tweet_created_at
+
+                        )
+
+                    }
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+            {/* Content */}
+
+            <p
+
+                style={{
+
+                    textAlign:"left",
+
+                    lineHeight:"1.6"
+
+                }}
+
+            >
+
+                {
+
+                    tweet.content
+
+                }
 
             </p>
 
@@ -177,6 +417,10 @@ export default function ArchiveDetail(){
 
 
 
+
+
+
+            {/* Media */}
 
             {
 
@@ -207,6 +451,42 @@ export default function ArchiveDetail(){
 
 
 
+            {
+                tweet.saved_at &&
+
+                <div
+
+                    style={{
+
+                        marginTop:"20px",
+
+                        color:"#666",
+
+                        fontSize:"13px",
+
+                        textAlign:"left"
+
+                    }}
+
+                >
+
+                    Saved at:
+
+                    {" "}
+
+                    {
+
+                        formatDate(
+
+                            tweet.saved_at
+
+                        )
+
+                    }
+
+                </div>
+
+            }
 
 
 
@@ -241,6 +521,7 @@ export default function ArchiveDetail(){
 
 
                 :
+
 
                 tags.map(
 
@@ -280,7 +561,9 @@ export default function ArchiveDetail(){
 
 
 
+
             <hr/>
+
 
 
 
@@ -314,6 +597,7 @@ export default function ArchiveDetail(){
 
                 :
 
+
                 comments.map(
 
                     comment=>(
@@ -324,7 +608,9 @@ export default function ArchiveDetail(){
 
                             style={{
 
-                                marginBottom:"10px"
+                                marginBottom:"10px",
+
+                                textAlign:"left"
 
                             }}
 
@@ -339,72 +625,6 @@ export default function ArchiveDetail(){
                 )
 
             }
-
-
-
-
-
-
-            <hr/>
-
-
-
-
-
-            <div
-
-                style={{
-
-                    color:"#666",
-
-                    fontSize:"14px"
-
-                }}
-
-            >
-
-
-                <p>
-
-                    Posted:
-
-                    {" "}
-
-                    {
-
-                        formatDate(
-
-                            tweet.tweet_created_at
-
-                        )
-
-                    }
-
-                </p>
-
-
-
-                <p>
-
-                    Saved:
-
-                    {" "}
-
-                    {
-
-                        formatDate(
-
-                            tweet.saved_at
-
-                        )
-
-                    }
-
-                </p>
-
-
-
-            </div>
 
 
 

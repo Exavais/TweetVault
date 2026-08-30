@@ -21,21 +21,42 @@ export default function Timeline(){
 
 
     return (
-        <div>
 
-            <h1>
-                Timeline
-            </h1>
+    <div
 
-            {
-                tweets.map(tweet => (
+        style={{
+
+            maxWidth:"800px",
+
+            margin:"auto",
+
+            padding:"20px"
+
+        }}
+
+    >
+
+        {
+
+            tweets.map(
+
+                tweet=>(
+
                     <TweetCard
-                        key={tweet.id}
-                        tweet={tweet}
-                    />
-                ))
-            }
 
-        </div>
-    );
+                        key={tweet.id}
+
+                        tweet={tweet}
+
+                    />
+
+                )
+
+            )
+
+        }
+
+    </div>
+
+    )
 }

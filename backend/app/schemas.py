@@ -17,20 +17,20 @@ class ArchiveCreate(BaseModel):
 
 class UserResponse(BaseModel):
 
-    id: int
+    id:int
 
-    twitter_id: str
+    twitter_id:str
 
-    username: str
+    username:str
 
-    display_name: str | None
+    display_name:str | None
 
-    avatar_url: str | None
+    avatar_path:str | None
 
 
     class Config:
 
-        from_attributes = True
+        from_attributes=True
 
 
 

@@ -32,7 +32,6 @@ class User(Base):
 
     twitter_id = Column(
         String,
-        unique=True,
         nullable=False
     )
 
@@ -49,7 +48,7 @@ class User(Base):
     )
 
 
-    avatar_url = Column(
+    avatar_path = Column(
         String,
         nullable=True
     )

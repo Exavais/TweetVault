@@ -9,16 +9,18 @@ from .database import get_db
 
 from .schemas import ArchiveCreate
 from .schemas import ArchiveResponse
+from .schemas import UserResponse
 
 from . import crud
 
 from fastapi import UploadFile, File
 from fastapi import HTTPException
 
-from .models import Archive, Media
+from .models import Archive, Media, User
 from .schemas import MediaResponse
 
 from .storage import save_file
+from .storage import save_avatar
 
 from .schemas import TagCreate
 from .schemas import TagResponse
@@ -66,6 +68,107 @@ def root():
 
 
 @app.post(
+    "/api/users",
+    response_model=UserResponse
+)
+def create_user(
+    username: str,
+    display_name: str | None = None,
+    twitter_id: str = "",
+    db: Session = Depends(get_db)
+):
+
+    user = User(
+
+        username=username,
+
+        display_name=display_name,
+
+        twitter_id=twitter_id
+
+    )
+
+
+    db.add(user)
+
+    db.commit()
+
+    db.refresh(user)
+
+
+    return user
+
+
+@app.get(
+    "/api/users",
+    response_model=list[UserResponse]
+)
+def list_users(
+    db: Session = Depends(get_db)
+):
+
+    return (
+
+        db.query(User)
+
+        .all()
+
+    )
+
+
+@app.post(
+    "/api/users/{user_id}/avatar/upload",
+    response_model=UserResponse
+)
+def upload_avatar(
+
+    user_id:int,
+
+    file:UploadFile = File(...),
+
+    db:Session = Depends(get_db)
+
+):
+
+    user = (
+
+        db.query(User)
+
+        .filter(
+            User.id == user_id
+        )
+
+        .first()
+
+    )
+
+
+    if user is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+
+    path = save_avatar(
+        file,
+        user_id
+    )
+
+
+    user.avatar_path = path
+
+
+    db.commit()
+
+    db.refresh(user)
+
+
+    return user
+
+
+@app.post(
     "/api/archives",
     response_model=ArchiveResponse
 )
@@ -73,9 +176,39 @@ def create_archive(
     archive: ArchiveCreate,
     db: Session = Depends(get_db)
 ):
+
+    user = (
+
+        db.query(User)
+
+        .filter(
+
+            User.id == archive.user_id
+
+        )
+
+        .first()
+
+    )
+
+
+    if user is None:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail="User not found"
+
+        )
+
+
     return crud.create_archive(
+
         db,
+
         archive
+
     )
 
 
