@@ -1,4 +1,6 @@
 import type { Tweet } from "../types/tweet";
+import MediaPreview from "./MediaPreview";
+import MediaGrid from "./MediaGrid";
 
 
 interface Props {
@@ -6,24 +8,21 @@ interface Props {
 }
 
 
-export default function TweetCard({ tweet }: Props) {
+export default function TweetCard({tweet}: Props){
 
     return (
         <div
             style={{
-                border: "1px solid #ddd",
-                borderRadius: "12px",
-                padding: "16px",
-                marginBottom: "12px",
-                maxWidth: "600px",
+                border:"1px solid #ddd",
+                borderRadius:"12px",
+                padding:"16px",
+                marginBottom:"16px"
             }}
         >
 
-            <div>
-                <strong>
-                    @{tweet.author}
-                </strong>
-            </div>
+            <h3>
+                @{tweet.author}
+            </h3>
 
 
             <p>
@@ -32,27 +31,48 @@ export default function TweetCard({ tweet }: Props) {
 
 
             {
-                tweet.tweet_created_at &&
-                <small>
-                    Posted:
-                    {" "}
-                    {new Date(tweet.tweet_created_at)
-                        .toLocaleString()}
-                </small>
+                <MediaGrid
+                    media={tweet.media}
+                />
             }
 
 
-            <br />
+            <div
+                style={{
+                    marginTop:"12px",
+                    fontSize:"12px",
+                    color:"#666"
+                }}
+            >
+
+                <div>
+                    Posted:
+                    {" "}
+                    {
+                        tweet.tweet_created_at
+                        ?
+                        new Date(
+                            tweet.tweet_created_at
+                        ).toLocaleString()
+                        :
+                        "-"
+                    }
+                </div>
 
 
-            <small>
-                Saved:
-                {" "}
-                {new Date(tweet.saved_at)
-                    .toLocaleString()}
-            </small>
+                <div>
+                    Saved:
+                    {" "}
+                    {
+                        new Date(
+                            tweet.saved_at
+                        ).toLocaleString()
+                    }
+                </div>
+
+            </div>
 
 
         </div>
-    );
+    )
 }

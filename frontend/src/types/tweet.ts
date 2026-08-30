@@ -1,15 +1,32 @@
+export interface Media {
+
+    id:number;
+
+    filename:string;
+
+    file_path:string;
+
+    media_type:string;
+
+    size:number;
+
+    spoiler:boolean;
+}
+
+
 export interface Tweet {
 
-    id: number;
+    id:number;
 
-    url: string;
+    url:string;
 
-    author: string;
+    author:string;
 
-    content: string;
+    content:string;
 
-    tweet_created_at: string | null;
+    tweet_created_at:string|null;
 
-    saved_at: string;
+    saved_at:string;
 
+    media: Media[];
 }
