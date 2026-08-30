@@ -11,6 +11,11 @@ from .database import Base
 from sqlalchemy import Boolean
 from sqlalchemy import ForeignKey
 
+from sqlalchemy import Table
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
+
+
 class Archive(Base):
 
     __tablename__ = "archives"
@@ -43,6 +48,8 @@ class Archive(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+
 
 class Media(Base):
 
@@ -91,4 +98,94 @@ class Media(Base):
     spoiler = Column(
         Boolean,
         default=True
+    )
+
+
+
+class Tag(Base):
+
+    __tablename__ = "tags"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    name = Column(
+        String,
+        unique=True,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+
+
+class ArchiveTag(Base):
+
+    __tablename__ = "archive_tags"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    archive_id = Column(
+        Integer,
+        ForeignKey("archives.id"),
+        nullable=False
+    )
+
+    tag_id = Column(
+        Integer,
+        ForeignKey("tags.id"),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+
+
+class TagHistory(Base):
+
+    __tablename__ = "tag_history"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    archive_id = Column(
+        Integer,
+        ForeignKey("archives.id"),
+        nullable=False
+    )
+
+    operation = Column(
+        String,
+        nullable=False
+    )
+
+    old_value = Column(
+        String,
+        nullable=True
+    )
+
+    new_value = Column(
+        String,
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
     )
