@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
 import type { Tweet } from "../types/tweet";
+import TweetCard from "../components/TweetCard";
 
 
 export default function Timeline(){
@@ -27,18 +28,11 @@ export default function Timeline(){
             </h1>
 
             {
-                tweets.map(tweet=>(
-                    <div key={tweet.id}>
-
-                        <h3>
-                            {tweet.author}
-                        </h3>
-
-                        <p>
-                            {tweet.content}
-                        </p>
-
-                    </div>
+                tweets.map(tweet => (
+                    <TweetCard
+                        key={tweet.id}
+                        tweet={tweet}
+                    />
                 ))
             }
 
