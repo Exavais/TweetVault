@@ -18,6 +18,49 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
 
+class User(Base):
+
+    __tablename__ = "users"
+
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+
+    twitter_id = Column(
+        String,
+        unique=True,
+        nullable=False
+    )
+
+
+    username = Column(
+        String,
+        nullable=False
+    )
+
+
+    display_name = Column(
+        String,
+        nullable=True
+    )
+
+
+    avatar_url = Column(
+        String,
+        nullable=True
+    )
+
+
+    archives = relationship(
+        "Archive",
+        back_populates="user"
+    )
+
+
 class Archive(Base):
 
     __tablename__ = "archives"
@@ -36,10 +79,17 @@ class Archive(Base):
     )
 
 
-    author = Column(
-        String
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
     )
 
+
+    user = relationship(
+        "User",
+        back_populates="archives"
+    )
 
     content = Column(
         Text

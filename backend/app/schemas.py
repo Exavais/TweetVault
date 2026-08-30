@@ -7,11 +7,30 @@ class ArchiveCreate(BaseModel):
 
     url: str
 
-    author: str
+    user_id: int
 
     content: str
 
     tweet_created_at: datetime | None = None
+
+
+
+class UserResponse(BaseModel):
+
+    id: int
+
+    twitter_id: str
+
+    username: str
+
+    display_name: str | None
+
+    avatar_url: str | None
+
+
+    class Config:
+
+        from_attributes = True
 
 
 
@@ -41,7 +60,7 @@ class ArchiveResponse(BaseModel):
 
     url: str
 
-    author: str
+    user: UserResponse
 
     content: str
 
@@ -111,7 +130,7 @@ class SearchResponse(BaseModel):
 
     url: str
 
-    author: str
+    user: UserResponse
 
     content: str
 
@@ -129,7 +148,7 @@ class TimelineResponse(BaseModel):
 
     id: int
 
-    author: str
+    user: UserResponse
 
     content: str
 
