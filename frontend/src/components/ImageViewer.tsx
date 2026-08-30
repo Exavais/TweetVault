@@ -180,7 +180,29 @@ export default function ImageViewer({
                 </button>
             }
 
+            <div
 
+                style={{
+
+                    position:"fixed",
+
+                    top:"20px",
+
+                    left:"50%",
+
+                    transform:"translateX(-50%)",
+
+                    color:"white",
+
+                    fontSize:"16px"
+
+                }}
+
+            >
+
+                {index + 1} / {media.length}
+
+            </div>
 
             <button
 
@@ -202,6 +224,8 @@ export default function ImageViewer({
                     border:"none",
                     cursor:"pointer"
                 }}
+
+            
 
             >
                 ✕
