@@ -8,6 +8,8 @@ from datetime import datetime
 
 from .database import Base
 
+from sqlalchemy import Boolean
+from sqlalchemy import ForeignKey
 
 class Archive(Base):
 
@@ -40,4 +42,53 @@ class Archive(Base):
     created_at = Column(
         DateTime,
         default=datetime.utcnow
+    )
+
+class Media(Base):
+
+    __tablename__ = "media"
+
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+
+    archive_id = Column(
+        Integer,
+        ForeignKey("archives.id")
+    )
+
+
+    filename = Column(
+        String
+    )
+
+
+    file_path = Column(
+        String
+    )
+
+
+    thumbnail_path = Column(
+        String,
+        nullable=True
+    )
+
+
+    media_type = Column(
+        String
+    )
+
+
+    size = Column(
+        Integer
+    )
+
+
+    spoiler = Column(
+        Boolean,
+        default=True
     )
