@@ -37,6 +37,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import joinedload
 
+from fastapi.staticfiles import StaticFiles
+
 
 Base.metadata.create_all(
     bind=engine
@@ -46,6 +48,13 @@ Base.metadata.create_all(
 app = FastAPI(
     title="TweetVault API",
     version="0.1.0"
+)
+
+
+app.mount(
+    "/storage",
+    StaticFiles(directory="storage"),
+    name="storage"
 )
 
 
