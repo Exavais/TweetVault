@@ -1,5 +1,11 @@
+import { useState } from "react";
+
 import type { Media } from "../types/tweet";
+
 import MediaPreview from "./MediaPreview";
+
+import ImageViewer from "./ImageViewer";
+
 
 
 interface Props {
@@ -9,26 +15,59 @@ interface Props {
 }
 
 
+
 export default function MediaGrid({
+
     media
+
 }: Props) {
 
 
-    if (!media || media.length === 0) {
+    const [viewer,setViewer] = useState(false);
+
+    const [index,setIndex] = useState(0);
+
+
+
+    if(!media || media.length === 0){
+
         return null;
+
     }
 
 
 
-    if (media.length === 1) {
+    function openViewer(i:number){
+
+        setIndex(i);
+
+        setViewer(true);
+
+    }
+
+
+
+    function renderMedia(
+
+        item:Media,
+
+        i:number
+
+    ){
 
         return (
 
             <MediaPreview
 
-                media={media[0]}
+                key={item.id}
 
-                allMedia={media}
+                media={item}
+
+                onClick={()=>{
+
+                    openViewer(i);
+
+                }}
 
             />
 
@@ -38,95 +77,318 @@ export default function MediaGrid({
 
 
 
-    if (media.length === 3) {
+    let content;
 
-        return (
+
+
+    // 1张
+
+    if(media.length === 1){
+
+
+        content=(
 
             <div
+
                 style={{
-                    display:"grid",
-                    gridTemplateColumns:"2fr 1fr",
-                    gridTemplateRows:"1fr 1fr",
-                    gap:"8px"
+
+                    aspectRatio:"16 / 9"
+
                 }}
+
             >
 
-                <div
-                    style={{
-                        gridRow:"1 / 3"
-                    }}
-                >
+                {
 
-                    <MediaPreview
+                    renderMedia(
 
-                        media={media[0]}
+                        media[0],
 
-                        allMedia={media}
+                        0
 
-                    />
+                    )
 
-                </div>
+                }
+
+            </div>
+
+        );
 
 
-
-                <MediaPreview
-
-                    media={media[1]}
-
-                    allMedia={media}
-
-                />
+    }
 
 
 
-                <MediaPreview
+    // 2张
 
-                    media={media[2]}
+    else if(media.length === 2){
 
-                    allMedia={media}
 
-                />
+        content=(
+
+            <div
+
+                style={{
+
+                    display:"grid",
+
+                    gridTemplateColumns:
+
+                        "1fr 1fr",
+
+                    gap:"8px"
+
+                }}
+
+            >
+
+                {
+
+                    media.map(
+
+                        (item,i)=>
+
+                            renderMedia(
+
+                                item,
+
+                                i
+
+                            )
+
+                    )
+
+                }
 
 
             </div>
 
         );
 
+
     }
+
+
+
+    // 3张
+
+    else if(media.length === 3){
+
+
+        content=(
+
+            <div
+
+                style={{
+
+                    display:"grid",
+
+                    gridTemplateColumns:
+
+                        "1fr 1fr",
+
+                    gap:"8px"
+
+                }}
+
+            >
+
+
+                {/* 左侧大图 */}
+
+                <div>
+
+                    {
+
+                        renderMedia(
+
+                            media[0],
+
+                            0
+
+                        )
+
+                    }
+
+                </div>
+
+
+
+                {/* 右侧两张 */}
+
+                <div
+
+                    style={{
+
+                        display:"grid",
+
+                        gridTemplateRows:
+
+                            "1fr 1fr",
+
+                        gap:"8px"
+
+                    }}
+
+                >
+
+
+                    <div
+
+                        style={{
+
+                            aspectRatio:
+
+                                "16 / 9"
+
+                        }}
+
+                    >
+
+                        {
+
+                            renderMedia(
+
+                                media[1],
+
+                                1
+
+                            )
+
+                        }
+
+                    </div>
+
+
+
+                    <div
+
+                        style={{
+
+                            aspectRatio:
+
+                                "16 / 9"
+
+                        }}
+
+                    >
+
+                        {
+
+                            renderMedia(
+
+                                media[2],
+
+                                2
+
+                            )
+
+                        }
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        );
+
+
+    }
+
+
+
+    // 4张
+
+    else {
+
+
+        content=(
+
+            <div
+
+                style={{
+
+                    display:"grid",
+
+                    gridTemplateColumns:
+
+                        "1fr 1fr",
+
+                    gap:"8px"
+
+                }}
+
+            >
+
+                {
+
+                    media
+
+                    .slice(0,4)
+
+                    .map(
+
+                        (item,i)=>
+
+                            renderMedia(
+
+                                item,
+
+                                i
+
+                            )
+
+                    )
+
+                }
+
+            </div>
+
+        );
+
+
+    }
+
 
 
 
     return (
 
-        <div
+        <>
 
-            style={{
-                display:"grid",
-                gridTemplateColumns:"repeat(2,1fr)",
-                gap:"8px"
-            }}
 
-        >
+            {content}
+
+
 
             {
-                media
-                    .slice(0,4)
-                    .map(item => (
 
-                        <MediaPreview
+                viewer &&
 
-                            key={item.id}
 
-                            media={item}
+                <ImageViewer
 
-                            allMedia={media}
+                    media={media}
 
-                        />
+                    index={index}
 
-                    ))
+                    onClose={()=>{
+
+                        setViewer(false)
+
+                    }}
+
+                    onChange={setIndex}
+
+                />
+
             }
 
-        </div>
+
+        </>
 
     );
 

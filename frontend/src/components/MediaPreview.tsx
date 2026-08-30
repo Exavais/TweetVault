@@ -1,36 +1,30 @@
 import { useState } from "react";
+
 import type { Media } from "../types/tweet";
-import ImageViewer from "./ImageViewer";
 
 
 interface Props {
 
     media: Media;
 
-    allMedia: Media[];
+    onClick: () => void;
 
 }
 
 
 
 export default function MediaPreview({
+
     media,
-    allMedia
+
+    onClick
+
 }: Props) {
 
 
-    const [hidden,setHidden] = useState(
+    const [hidden, setHidden] = useState(
         media.spoiler
     );
-
-
-    const [viewer,setViewer] = useState(false);
-
-
-    const [viewerIndex,setViewerIndex] = useState(
-        0
-    );
-
 
 
     const imageUrl =
@@ -38,136 +32,167 @@ export default function MediaPreview({
 
 
 
-    const openViewer = () => {
+    function handleClick(){
 
-        const index =
-            allMedia.findIndex(
-                item => item.id === media.id
-            );
+        if(hidden){
 
+            // 第一次点击：取消 spoiler
 
-        setViewerIndex(index);
+            setHidden(false);
 
-        setViewer(true);
+        }
+        else{
 
-    };
+            // 第二次点击：查看原图
+
+            onClick();
+
+        }
+
+    }
 
 
 
     return (
 
-        <>
+        <div
 
-            <div
+            onClick={handleClick}
 
-                onClick={() => {
+            style={{
 
-                    if(hidden){
+                width:"100%",
 
-                        setHidden(false);
+                height:"100%",
 
-                    }
-                    else{
+                overflow:"hidden",
 
-                        openViewer();
+                borderRadius:"12px",
 
-                    }
+                cursor:"pointer",
 
-                }}
+                position:"relative"
+
+            }}
+
+        >
+
+            <img
+
+                src={imageUrl}
+
+                alt={media.filename}
 
                 style={{
+
                     width:"100%",
-                    aspectRatio:"16 / 9",
-                    overflow:"hidden",
-                    borderRadius:"12px",
-                    cursor:"pointer",
-                    position:"relative"
+
+                    height:"100%",
+
+                    objectFit:"cover",
+
+                    filter: hidden
+                        ?
+                        "blur(18px)"
+                        :
+                        "none",
+
+                    transform: hidden
+                        ?
+                        "scale(1.08)"
+                        :
+                        "scale(1)"
+
                 }}
 
-            >
-
-
-                <img
-
-                    src={imageUrl}
-
-                    alt={media.filename}
-
-                    style={{
-
-                        width:"100%",
-                        height:"100%",
-                        objectFit:"cover",
-
-                        filter:hidden
-                            ?
-                            "blur(18px)"
-                            :
-                            "none",
-
-                        transform:hidden
-                            ?
-                            "scale(1.08)"
-                            :
-                            "scale(1)"
-
-                    }}
-
-                />
-
-
-
-                {
-                    hidden &&
-
-                    <div
-
-                        style={{
-                            position:"absolute",
-                            inset:0,
-                            display:"flex",
-                            alignItems:"center",
-                            justifyContent:"center",
-                            color:"white",
-                            background:"rgba(0,0,0,0.15)"
-                        }}
-
-                    >
-                        Click to reveal
-
-                    </div>
-
-                }
-
-
-            </div>
-
+            />
 
 
 
             {
-                viewer &&
+                hidden &&
 
-                <ImageViewer
+                <div
 
-                    media={allMedia}
+                    style={{
 
-                    index={viewerIndex}
+                        position:"absolute",
 
-                    onClose={
-                        ()=>setViewer(false)
-                    }
+                        inset:0,
 
-                    onChange={
-                        setViewerIndex
-                    }
+                        display:"flex",
 
-                />
+                        alignItems:"center",
+
+                        justifyContent:"center",
+
+                        color:"white",
+
+                        background:
+                            "rgba(0,0,0,0.15)",
+
+                        fontSize:"14px"
+
+                    }}
+
+                >
+
+                    Click to reveal
+
+                </div>
 
             }
 
 
-        </>
+
+            {
+                !hidden &&
+
+                <button
+
+                    onClick={(e)=>{
+
+                        e.stopPropagation();
+
+                        setHidden(true);
+
+                    }}
+
+                    style={{
+
+                        position:"absolute",
+
+                        right:"8px",
+
+                        top:"8px",
+
+                        background:
+                            "rgba(0,0,0,0.5)",
+
+                        color:"white",
+
+                        border:"none",
+
+                        borderRadius:"8px",
+
+                        padding:"4px 8px",
+
+                        cursor:"pointer",
+
+                        zIndex:2
+
+                    }}
+
+                >
+
+                    Hide
+
+                </button>
+
+            }
+
+
+        </div>
 
     );
 
