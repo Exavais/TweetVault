@@ -22,6 +22,10 @@ from .storage import save_file
 from .schemas import TagCreate
 from .schemas import TagResponse
 
+from .schemas import CommentCreate
+from .schemas import CommentUpdate
+from .schemas import CommentResponse
+
 
 Base.metadata.create_all(
     bind=engine
@@ -209,6 +213,73 @@ def delete_tag(
         tag_id
     )
 
+
+    return {
+        "message": "deleted"
+    }
+
+
+@app.post(
+    "/api/archives/{archive_id}/comments",
+    response_model=CommentResponse
+)
+def create_comment(
+    archive_id: int,
+    comment: CommentCreate,
+    db: Session = Depends(get_db)
+):
+
+    return crud.create_comment(
+        db,
+        archive_id,
+        comment.content
+    )
+
+
+@app.get(
+    "/api/archives/{archive_id}/comments",
+    response_model=list[CommentResponse]
+)
+def list_comments(
+    archive_id: int,
+    db: Session = Depends(get_db)
+):
+
+    return crud.get_comments(
+        db,
+        archive_id
+    )
+
+
+@app.patch(
+    "/api/comments/{comment_id}",
+    response_model=CommentResponse
+)
+def update_comment(
+    comment_id: int,
+    comment: CommentUpdate,
+    db: Session = Depends(get_db)
+):
+
+    return crud.update_comment(
+        db,
+        comment_id,
+        comment.content
+    )
+
+
+@app.delete(
+    "/api/comments/{comment_id}"
+)
+def remove_comment(
+    comment_id: int,
+    db: Session = Depends(get_db)
+):
+
+    crud.delete_comment(
+        db,
+        comment_id
+    )
 
     return {
         "message": "deleted"

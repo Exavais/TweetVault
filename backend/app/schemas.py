@@ -65,3 +65,33 @@ class TagResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class CommentCreate(BaseModel):
+
+    content: str
+
+
+
+class CommentUpdate(BaseModel):
+
+    content: str
+
+
+
+class CommentResponse(BaseModel):
+
+    id: int
+
+    archive_id: int
+
+    content: str
+
+    created_at: datetime
+
+    updated_at: datetime
+
+
+    class Config:
+        from_attributes = True

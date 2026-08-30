@@ -151,3 +151,37 @@ class ArchiveTag(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
+
+
+
+class Comment(Base):
+
+    __tablename__ = "comments"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    archive_id = Column(
+        Integer,
+        ForeignKey("archives.id"),
+        nullable=False
+    )
+
+    content = Column(
+        String,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )

@@ -6,6 +6,7 @@ from .schemas import ArchiveCreate
 from .models import Media
 from .models import Tag
 from .models import ArchiveTag
+from .models import Comment
 
 
 def create_archive(
@@ -207,3 +208,86 @@ def remove_tag_from_archive(
 
 
     return relation
+
+
+
+def create_comment(
+    db: Session,
+    archive_id: int,
+    content: str
+):
+
+    comment = Comment(
+        archive_id=archive_id,
+        content=content
+    )
+
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+
+    return comment
+
+
+
+def get_comments(
+    db: Session,
+    archive_id: int
+):
+
+    return (
+        db.query(Comment)
+        .filter(
+            Comment.archive_id == archive_id
+        )
+        .all()
+    )
+
+
+
+def update_comment(
+    db: Session,
+    comment_id: int,
+    content: str
+):
+
+    comment = (
+        db.query(Comment)
+        .filter(
+            Comment.id == comment_id
+        )
+        .first()
+    )
+
+    if comment:
+
+        comment.content = content
+
+        db.commit()
+
+        db.refresh(comment)
+
+    return comment
+
+
+
+def delete_comment(
+    db: Session,
+    comment_id: int
+):
+
+    comment = (
+        db.query(Comment)
+        .filter(
+            Comment.id == comment_id
+        )
+        .first()
+    )
+
+    if comment:
+
+        db.delete(comment)
+
+        db.commit()
+
+    return comment
