@@ -44,7 +44,12 @@ class Archive(Base):
     )
 
 
-    created_at = Column(
+    tweet_created_at = Column(
+    DateTime,
+    nullable=True
+)
+
+    saved_at = Column(
         DateTime,
         default=datetime.utcnow
     )

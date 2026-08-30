@@ -8,26 +8,28 @@ from .models import Tag
 from .models import ArchiveTag
 from .models import Comment
 
+from sqlalchemy import or_
+
 
 def create_archive(
     db: Session,
-    archive: ArchiveCreate
+    archive
 ):
 
-    item = Archive(
+    db_archive = Archive(
         url=archive.url,
         author=archive.author,
-        content=archive.content
+        content=archive.content,
+        tweet_created_at=archive.tweet_created_at
     )
 
-
-    db.add(item)
+    db.add(db_archive)
 
     db.commit()
 
-    db.refresh(item)
+    db.refresh(db_archive)
 
-    return item
+    return db_archive
 
 
 
@@ -291,3 +293,127 @@ def delete_comment(
         db.commit()
 
     return comment
+
+
+
+def search_archives(
+    db: Session,
+    author: str | None = None,
+    keyword: str | None = None,
+    tag: str | None = None,
+    comment: str | None = None,
+    tweet_start=None,
+    tweet_end=None,
+    saved_start=None,
+    saved_end=None
+):
+
+    query = db.query(Archive)
+
+
+    # 作者搜索
+    if author:
+
+        query = query.filter(
+            Archive.author.contains(author)
+        )
+
+
+    # 文案关键词
+    if keyword:
+
+        query = query.filter(
+            Archive.content.contains(keyword)
+        )
+
+
+    # 推文发布时间
+    if tweet_start:
+
+        query = query.filter(
+            Archive.tweet_created_at >= tweet_start
+        )
+
+
+    if tweet_end:
+
+        query = query.filter(
+            Archive.tweet_created_at <= tweet_end
+        )
+
+
+    # 保存时间
+    if saved_start:
+
+        query = query.filter(
+            Archive.saved_at >= saved_start
+        )
+
+
+    if saved_end:
+
+        query = query.filter(
+            Archive.saved_at <= saved_end
+        )
+
+
+    # Tag 搜索
+    if tag:
+
+        query = (
+            query
+            .join(
+                ArchiveTag,
+                Archive.id == ArchiveTag.archive_id
+            )
+            .join(
+                Tag,
+                Tag.id == ArchiveTag.tag_id
+            )
+            .filter(
+                Tag.name.contains(tag)
+            )
+        )
+
+
+    # Comment 搜索
+    if comment:
+
+        query = (
+            query
+            .join(
+                Comment,
+                Archive.id == Comment.archive_id
+            )
+            .filter(
+                Comment.content.contains(comment)
+            )
+        )
+
+
+    return query.distinct().all()
+
+
+
+def get_timeline(
+    db: Session,
+    author: str | None = None
+):
+
+    query = db.query(Archive)
+
+
+    if author:
+
+        query = query.filter(
+            Archive.author.contains(author)
+        )
+
+
+    return (
+        query
+        .order_by(
+            Archive.tweet_created_at.desc()
+        )
+        .all()
+    )

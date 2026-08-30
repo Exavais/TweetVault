@@ -10,6 +10,8 @@ class ArchiveCreate(BaseModel):
 
     content: str
 
+    tweet_created_at: datetime | None = None
+
 
 
 class ArchiveResponse(BaseModel):
@@ -22,7 +24,9 @@ class ArchiveResponse(BaseModel):
 
     content: str
 
-    created_at: datetime
+    tweet_created_at: datetime | None
+
+    saved_at: datetime
 
 
     class Config:
@@ -91,6 +95,44 @@ class CommentResponse(BaseModel):
     created_at: datetime
 
     updated_at: datetime
+
+
+    class Config:
+        from_attributes = True
+
+
+
+class SearchResponse(BaseModel):
+
+    id: int
+
+    url: str
+
+    author: str
+
+    content: str
+
+    tweet_created_at: datetime | None
+
+    saved_at: datetime
+
+
+    class Config:
+        from_attributes = True
+
+
+
+class TimelineResponse(BaseModel):
+
+    id: int
+
+    author: str
+
+    content: str
+
+    tweet_created_at: datetime | None
+
+    saved_at: datetime
 
 
     class Config:

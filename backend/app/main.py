@@ -26,6 +26,12 @@ from .schemas import CommentCreate
 from .schemas import CommentUpdate
 from .schemas import CommentResponse
 
+from datetime import datetime
+
+from .schemas import SearchResponse
+
+from .schemas import TimelineResponse
+
 
 Base.metadata.create_all(
     bind=engine
@@ -284,3 +290,54 @@ def remove_comment(
     return {
         "message": "deleted"
     }
+
+
+@app.get(
+    "/api/search",
+    response_model=list[SearchResponse]
+)
+def search(
+    author: str | None = None,
+    keyword: str | None = None,
+    tag: str | None = None,
+    comment: str | None = None,
+
+    tweet_start: datetime | None = None,
+    tweet_end: datetime | None = None,
+
+    saved_start: datetime | None = None,
+    saved_end: datetime | None = None,
+
+    db: Session = Depends(get_db)
+):
+
+    return crud.search_archives(
+        db,
+
+        author,
+        keyword,
+
+        tag,
+        comment,
+
+        tweet_start,
+        tweet_end,
+
+        saved_start,
+        saved_end
+    )
+
+
+@app.get(
+    "/api/timeline",
+    response_model=list[TimelineResponse]
+)
+def timeline(
+    author: str | None = None,
+    db: Session = Depends(get_db)
+):
+
+    return crud.get_timeline(
+        db,
+        author
+    )
