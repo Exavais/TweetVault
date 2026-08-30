@@ -127,3 +127,33 @@ def upload_media(
 
 
     return media
+
+
+@app.get(
+    "/api/media/{id}",
+    response_model=MediaResponse
+)
+def get_media(
+    id:int,
+    db:Session=Depends(get_db)
+):
+
+    return crud.get_media(
+        db,
+        id
+    )
+
+
+@app.patch(
+    "/api/media/{id}/spoiler",
+    response_model=MediaResponse
+)
+def toggle_spoiler(
+    id:int,
+    db:Session=Depends(get_db)
+):
+
+    return crud.toggle_media_spoiler(
+        db,
+        id
+    )
