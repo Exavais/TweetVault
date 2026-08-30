@@ -19,6 +19,9 @@ from .schemas import MediaResponse
 
 from .storage import save_file
 
+from .schemas import TagCreate
+from .schemas import TagResponse
+
 
 Base.metadata.create_all(
     bind=engine
@@ -157,3 +160,56 @@ def toggle_spoiler(
         db,
         id
     )
+
+
+@app.post(
+    "/api/archives/{archive_id}/tags",
+    response_model=TagResponse
+)
+def add_tag(
+    archive_id: int,
+    tag: TagCreate,
+    db: Session = Depends(get_db)
+):
+
+    return crud.add_tag_to_archive(
+        db,
+        archive_id,
+        tag.name
+    )
+
+
+@app.get(
+    "/api/archives/{archive_id}/tags",
+    response_model=list[TagResponse]
+)
+def list_tags(
+    archive_id: int,
+    db: Session = Depends(get_db)
+):
+
+    return crud.get_archive_tags(
+        db,
+        archive_id
+    )
+
+
+@app.delete(
+    "/api/archives/{archive_id}/tags/{tag_id}"
+)
+def delete_tag(
+    archive_id: int,
+    tag_id: int,
+    db: Session = Depends(get_db)
+):
+
+    crud.remove_tag_from_archive(
+        db,
+        archive_id,
+        tag_id
+    )
+
+
+    return {
+        "message": "deleted"
+    }

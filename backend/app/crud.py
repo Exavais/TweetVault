@@ -4,6 +4,8 @@ from .models import Archive
 from .schemas import ArchiveCreate
 
 from .models import Media
+from .models import Tag
+from .models import ArchiveTag
 
 
 def create_archive(
@@ -102,3 +104,106 @@ def toggle_media_spoiler(
 
 
     return media
+
+
+
+def create_tag(
+    db: Session,
+    name: str
+):
+
+    tag = db.query(
+        Tag
+    ).filter(
+        Tag.name == name
+    ).first()
+
+
+    if tag:
+        return tag
+
+
+    tag = Tag(
+        name=name
+    )
+
+    db.add(tag)
+
+    db.commit()
+
+    db.refresh(tag)
+
+    return tag
+
+
+
+def add_tag_to_archive(
+    db: Session,
+    archive_id: int,
+    tag_name: str
+):
+
+    tag = create_tag(
+        db,
+        tag_name
+    )
+
+
+    relation = ArchiveTag(
+        archive_id=archive_id,
+        tag_id=tag.id
+    )
+
+
+    db.add(relation)
+
+    db.commit()
+
+
+    return tag
+
+
+
+def get_archive_tags(
+    db: Session,
+    archive_id: int
+):
+
+    return (
+        db.query(Tag)
+        .join(
+            ArchiveTag,
+            Tag.id == ArchiveTag.tag_id
+        )
+        .filter(
+            ArchiveTag.archive_id == archive_id
+        )
+        .all()
+    )
+
+
+
+def remove_tag_from_archive(
+    db: Session,
+    archive_id: int,
+    tag_id: int
+):
+
+    relation = (
+        db.query(ArchiveTag)
+        .filter(
+            ArchiveTag.archive_id == archive_id,
+            ArchiveTag.tag_id == tag_id
+        )
+        .first()
+    )
+
+
+    if relation:
+
+        db.delete(relation)
+
+        db.commit()
+
+
+    return relation
